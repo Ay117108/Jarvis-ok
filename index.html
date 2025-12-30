@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>JARVIS AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  background:black;
+  color:cyan;
+  font-family:Arial;
+  text-align:center;
+  padding:20px;
+}
+button{
+  padding:15px 25px;
+  font-size:18px;
+  border-radius:50px;
+  border:none;
+  background:cyan;
+  color:black;
+}
+#log{
+  margin-top:20px;
+  text-align:left;
+  max-height:300px;
+  overflow:auto;
+  border-top:1px solid cyan;
+  padding-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🤖 JARVIS</h1>
+<p>
+Say:<br>
+<b>Jarvis</b><br>
+<b>Open my YouTube</b><br>
+<b>What time is it</b><br>
+<b>Search Iron Man</b>
+</p>
+
+<button onclick="startJarvis()">🎤 Start Jarvis</button>
+<div id="log"></div>
+
+<script>
+/* ========= CUSTOM LINKS ========= */
+const YOUTUBE = "https://www.youtube.com/@YOURCHANNEL";
+const INSTAGRAM = "https://www.instagram.com/YOURUSERNAME";
+const FACEBOOK = "https://www.facebook.com/";
+/* =============================== */
+
+let recognition;
+let waitingForCommand = false;
+const log = document.getElementById("log");
+
+function startJarvis(){
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.lang = "hi-IN";
+  recognition.continuous = true;
+  recognition.start();
+
+  speak("Jarvis online. Main sun raha hoon.");
+
+  recognition.onresult = (e) => {
+    const text = e.results[e.results.length-1][0].transcript.toLowerCase();
+    addLog("🗣️ " + text);
+    process(text);
+  };
+}
+
+function process(text){
+
+  /* WAKE WORD */
+  if(text.includes("jarvis")){
+    speak("Yes sir");
+    waitingForCommand = true;
+    return;
+  }
+
+  if(!waitingForCommand) return;
+
+  /* OPEN APPS / WEBSITES */
+  if(text.includes("open") && text.includes("youtube")){
+    speak("Opening your YouTube");
+    window.open(YOUTUBE, "_blank");
+  }
+  else if(text.includes("open") && text.includes("instagram")){
+    speak("Opening Instagram");
+    window.open(INSTAGRAM, "_blank");
+  }
+  else if(text.includes("open") && text.includes("facebook")){
+    speak("Opening Facebook");
+    window.open(FACEBOOK, "_blank");
+  }
+
+  /* TIME */
+  else if(text.includes("time")){
+    const t = new Date().toLocaleTimeString();
+    speak("Abhi time hai " + t);
+  }
+
+  /* DATE */
+  else if(text.includes("date")){
+    const d = new Date().toDateString();
+    speak("Aaj ki date hai " + d);
+  }
+
+  /* SEARCH ANYTHING */
+  else if(text.includes("search")){
+    const q = text.replace("search", "");
+    speak(q + " search kar raha hoon");
+    window.open("https://www.google.com/search?q=" + q, "_blank");
+  }
+
+  /* NORMAL TALK (BASIC AI MODE) */
+  else if(text.includes("who are you") || text.includes("tum kaun ho")){
+    speak("Main Jarvis hoon, aapka personal AI assistant");
+  }
+
+  else{
+    speak("Command samajh nahi aaya sir, dubara boliye");
+  }
+
+  waitingForCommand = false;
+}
+
+function speak(msg){
+  addLog("🤖 " + msg);
+  const u = new SpeechSynthesisUtterance(msg);
+  u.lang = "hi-IN";
+  window.speechSynthesis.speak(u);
+}
+
+function addLog(m){
+  log.innerHTML += m + "<br>";
+  log.scrollTop = log.scrollHeight;
+}
+</script>
+
+</body>
+</html>
